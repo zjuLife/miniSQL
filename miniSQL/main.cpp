@@ -3,6 +3,7 @@
 #include "interpreter.h"
 #include "ErrorCode.h"
 using namespace std;
+//gao
 void initialScreen(){
 	cout<<"== Welcome into miniSQL =="<<endl;
 	cout<<"== version 1.0 =="<<endl;

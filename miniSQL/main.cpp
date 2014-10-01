@@ -1,6 +1,6 @@
 #include <iostream>
 void ben(){
-	;
+	12;
 }
 void wang(){
 	;

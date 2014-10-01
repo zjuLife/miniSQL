@@ -9,14 +9,19 @@ string trim(string input){
 	}
 	else{
 		input.erase(0, input.find_first_not_of(" "));
+
 		input.erase(0, input.find_first_not_of("\t"));
-		input.erase(0, input.find_last_not_of("0"));
-		input.erase(0, input.find_last_not_of("\t"));
+			
+		input.erase(input.find_last_not_of(" ")+1);
+
+		input.erase(input.find_last_not_of("\t")+1);
+
 		return input;
 	}
 }
 int Interpreter::getCmd(string origincmd){
 	string cmd = trim(origincmd);
+
 	if(cmd == "quit"){
 		return QUITMINISQL;
 	}
@@ -88,7 +93,31 @@ int Interpreter::execFile(string fileName){
 	}
 }
 void Interpreter::formatCMD(string cmd){
+	int minpos;
+	int spacepos = cmd.find_first_of(" ");
+	int tabpos = cmd.find_first_of("\t");
 	
+	if(tabpos == -1&&spacepos == -1){
+		minpos = -1;
+	}
+	else if(tabpos == -1){
+		minpos = spacepos;
+		
+	}
+	else if(spacepos == -1){
+		minpos = tabpos;
+	}
+	else{
+		minpos = (spacepos>tabpos)?tabpos:spacepos;
+	}
+	if(minpos == -1){
+		opType = "Error";
+	}
+	else{
+		opType = cmd.substr(0, minpos);
+		query = cmd.substr(minpos+1, cmd.length()-minpos-1);
+
+	}
 }
 
 

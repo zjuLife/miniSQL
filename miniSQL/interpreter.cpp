@@ -10,7 +10,7 @@ string trim(string input){
 	else{
 		int startpos = 0;
 		int finishpos = input.length();
-		int i;
+		size_t i;
 		for(i=0;i<input.length();i++){
 			if(input.at(i)!=' '&&input.at(i)!='\t'){
 				startpos = i;
@@ -78,13 +78,16 @@ int Interpreter::doQuery(){
 void Interpreter::resetQuery(){
 	query = "";
 	opType = "";
+	objType = "";
+	objName = "";
+
 }
 int Interpreter::execFile(string fileName){
 	//FIXME: not test yet!!!
 	ifstream fp;
     fp.open(fileName,ifstream::in);
 	if(fp == NULL){
-		return FNOTFOUND;
+		return FILENOTFOUND;
 	}
 	else{
 		char buf[1000];
@@ -97,7 +100,7 @@ int Interpreter::execFile(string fileName){
 			temp = buf;
 			int resultCode = getCmd(temp);
 			if(resultCode!=SUCCESS||resultCode!=EMPTYSTRING){
-				return FNOTFOUND+line;
+				return FILENOTFOUND+line;
 			}
 		}
 		return SUCCESS;
@@ -134,20 +137,43 @@ int Interpreter::formatCMD(string cmd){
 	}
 	
 }
+
+/******************************************/
+/*
+FIXME:
+异常   还是用   返回值？
+二级传参
+*/
+/*****************************************/
 int Interpreter::doCreate(){
 	//WARNING: query 需要在format函数之后format
-	strstream tempStr;
-	tempStr << query;
-	string type;
-	tempStr>>type;
-	if(type=="table"){
-
+	if(objType == "table"){
+		return SUCCESS;
 	}
-	else if(type=="index"){
+	else if(objType == "index"){
+		return SUCCESS;
 	}
-	return SUCCESS;
+	else
+		return SYNTAXERROR;
 }
 int Interpreter::doDrop(){
+	if(objType == "table"){
+		try{
+
+		}catch(string error){
+			cout<<error<<endl;
+			return DROPTABLERROR;
+		}
+		return SUCCESS;
+	}
+	else if(objType == "index"){
+		try{
+		}catch(string error){
+			cout<<error<<endl;
+			return DROPINDEXERROR;
+		}
+		return SUCCESS;
+	}
 	return 0;
 }
 int Interpreter::doSelect(){

@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <strstream>
 using namespace std;
 class Interpreter{
 public:
@@ -14,9 +15,17 @@ public:
 private:
 	string query;
 	string opType;
+	string objType;		//表 还是 index
+	string objName;		//tablename 或者 indexname
 	void resetQuery();
 	int doQuery();
-	void formatCMD(string cmd);	//得到格式化后的query串 和query类型
+	int formatCMD(string cmd);	//得到格式化后的query串 和query类型
 	int execFile(string fileName);
+
+	int doCreate();
+	int doDrop();
+	int doSelect();
+	int doInsert();
+	int doDelete();
 };
 #endif

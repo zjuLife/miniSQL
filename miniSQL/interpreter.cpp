@@ -8,20 +8,27 @@ string trim(string input){
 		return input;
 	}
 	else{
-		input.erase(0, input.find_first_not_of(" "));
-
-		input.erase(0, input.find_first_not_of("\t"));
-			
-		input.erase(input.find_last_not_of(" ")+1);
-
-		input.erase(input.find_last_not_of("\t")+1);
-
+		int startpos = 0;
+		int finishpos = input.length();
+		int i;
+		for(i=0;i<input.length();i++){
+			if(input.at(i)!=' '&&input.at(i)!='\t'){
+				startpos = i;
+				break;
+			}
+		}
+		for(i=input.length()-1;i>0;i--){
+			if(input.at(i)!=' '&&input.at(i)!='\t'){
+				finishpos = i;
+				break;
+			}
+		}
+		input = input.substr(startpos, finishpos-startpos+1);
 		return input;
 	}
 }
 int Interpreter::getCmd(string origincmd){
 	string cmd = trim(origincmd);
-
 	if(cmd == "quit"){
 		return QUITMINISQL;
 	}
@@ -29,32 +36,35 @@ int Interpreter::getCmd(string origincmd){
 		return EMPTYSTRING;
 	}
 	else{
-		formatCMD(cmd);
-		int resultCode = doQuery();
-		resetQuery();
-		return resultCode;
+		int resultCode = formatCMD(cmd);
+		if(resultCode == SYNTAXERROR)
+			return resultCode;
+		else{
+			resultCode = doQuery();
+			resetQuery();
+			return resultCode;
+		}
 	}
 }
 int Interpreter::doQuery(){
 	//TODO:
 	if(opType == "create"){
-		//table index
-		return 0;
+		return doCreate();
 	}
 	else if(opType == "drop"){
 		//table index
-		return 0;
+		return doDrop();
 	}
 	else if(opType == "select"){
-		return 0;//list
+		return doSelect();//list
 	}
 	else if(opType == "insert"){
 		//list
-	return 0;
+	return doInsert();
 	}
 	else if(opType == "delete"){
 		//list
-		return 0;
+		return doDelete();
 	}
 	else if(opType == "execfile"){
 		string fileName;
@@ -70,6 +80,7 @@ void Interpreter::resetQuery(){
 	opType = "";
 }
 int Interpreter::execFile(string fileName){
+	//FIXME: not test yet!!!
 	ifstream fp;
     fp.open(fileName,ifstream::in);
 	if(fp == NULL){
@@ -92,7 +103,8 @@ int Interpreter::execFile(string fileName){
 		return SUCCESS;
 	}
 }
-void Interpreter::formatCMD(string cmd){
+int Interpreter::formatCMD(string cmd){
+	
 	int minpos;
 	int spacepos = cmd.find_first_of(" ");
 	int tabpos = cmd.find_first_of("\t");
@@ -111,13 +123,39 @@ void Interpreter::formatCMD(string cmd){
 		minpos = (spacepos>tabpos)?tabpos:spacepos;
 	}
 	if(minpos == -1){
-		opType = "Error";
+		return SYNTAXERROR;
 	}
 	else{
 		opType = cmd.substr(0, minpos);
 		query = cmd.substr(minpos+1, cmd.length()-minpos-1);
+		query = trim(query);
+		//TODO: format query string
+		return SUCCESS;
+	}
+	
+}
+int Interpreter::doCreate(){
+	//WARNING: query 需要在format函数之后format
+	strstream tempStr;
+	tempStr << query;
+	string type;
+	tempStr>>type;
+	if(type=="table"){
 
 	}
+	else if(type=="index"){
+	}
+	return SUCCESS;
 }
-
-
+int Interpreter::doDrop(){
+	return 0;
+}
+int Interpreter::doSelect(){
+	return 0;
+}
+int Interpreter::doInsert(){
+	return 0;
+}
+int Interpreter::doDelete(){
+	return 0;
+}

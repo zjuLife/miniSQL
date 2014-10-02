@@ -7,6 +7,13 @@ void initialScreen(){
 	cout<<"== version 1.0 =="<<endl;
 	cout<<endl;
 }
+void showError(int errorCode){
+	switch(errorCode){
+	case SUCCESS: cout<<"success!"<<endl; break;
+	case SYNTAXERROR: cout<<"syntax error"<<endl; break;
+	default: cout<<"uncaught exception"<<endl; break;
+	}
+}
 int main(void){
 
 	initialScreen();
@@ -17,7 +24,7 @@ int main(void){
 	Interpreter interpreter;
 	
 	while(true){
-		if(cmdErrorCode== SUCCESS){
+		if(cmdErrorCode!= QUITMINISQL){
 			cout<<"miniSQL>";
 		}
 		else{
@@ -27,6 +34,7 @@ int main(void){
 		gets_s(cmdBuffer);
 		string cmdLine(cmdBuffer);
 		cmdErrorCode = interpreter.getCmd(cmdLine);
+		showError(cmdErrorCode);
 	}
 	return 0;
 }

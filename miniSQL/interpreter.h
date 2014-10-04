@@ -13,7 +13,7 @@ public:
 	int getCmd(string cmd);
 	
 private:
-	string query;
+	string query;		//内容
 	string opType;
 	string objType;		//表 还是 index
 	string objName;		//tablename 或者 indexname

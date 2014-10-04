@@ -1,5 +1,7 @@
+//翻译命令  解析完成后  交给API class 处理
 #include "interpreter.h"
 #include "ErrorCode.h"
+#include "api.h"
 using namespace std;
 Interpreter::Interpreter(){}
 Interpreter::~Interpreter(){}
@@ -144,13 +146,28 @@ FIXME:
 异常   还是用   返回值？
 二级传参
 */
+
+/*
+
+*/
 /*****************************************/
 int Interpreter::doCreate(){
+	 //cout<<objType<<endl;
 	//WARNING: query 需要在format函数之后format
 	if(objType == "table"){
+		try{
+			API::getInstance().createTable(objName);
+		}catch(int errorCode){
+			return errorCode;
+		}
 		return SUCCESS;
 	}
 	else if(objType == "index"){
+		try{
+			API::getInstance().createIndex(objName);
+		}catch(int errorCode){
+			return errorCode;
+		}
 		return SUCCESS;
 	}
 	else
@@ -159,18 +176,17 @@ int Interpreter::doCreate(){
 int Interpreter::doDrop(){
 	if(objType == "table"){
 		try{
-
-		}catch(string error){
-			cout<<error<<endl;
-			return DROPTABLERROR;
+			API::getInstance().dropTable(objName);
+		}catch(int errorCode){
+			return errorCode;
 		}
 		return SUCCESS;
 	}
 	else if(objType == "index"){
 		try{
-		}catch(string error){
-			cout<<error<<endl;
-			return DROPINDEXERROR;
+			API::getInstance().dropIndex(objName);
+		}catch(int errorCode){
+			return errorCode;
 		}
 		return SUCCESS;
 	}

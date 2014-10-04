@@ -12,17 +12,17 @@ API& API::getInstance(){
 FIXME:
 采用  异常  返回执行后的错误结果
 */
-void API::createTable(){
+void API::createTable(string tableName){
 }
-void API::createIndex(){
+void API::createIndex(string indexName){
 }
-void API::dropIndex(){
+void API::dropIndex(string indexName){
 }
-void API::dropTable(){
+void API::dropTable(string tableName){
 }
-void API::selectFrom(){
+void API::selectFrom(string tableName){
 }
-void API::insertInto(){
+void API::insertInto(string tableName){
 }
-void API::deleteWhere(){
+void API::deleteWhere(string tableName){
 }

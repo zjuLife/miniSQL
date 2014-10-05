@@ -19,8 +19,8 @@ private:
 	string objName;		//tablename 或者 indexname
 	void resetQuery();
 	int doQuery();
-	int formatCMD(string cmd);	//得到格式化后的query串 和query类型
-	int execFile(string fileName);
+	int formatCMD(string& cmd);	//得到格式化后的query串 和query类型
+	int execFile(string& fileName);
 
 	int doCreate();
 	int doDrop();

@@ -7,7 +7,7 @@ void initialScreen(){
 	cout<<"== version 1.0 =="<<endl;
 	cout<<endl;
 }
-void showError(int errorCode){
+void showError(int& errorCode){
 	switch(errorCode){
 	case SUCCESS: cout<<"success!"<<endl; break;
 	case SYNTAXERROR: cout<<"syntax error"<<endl; break;

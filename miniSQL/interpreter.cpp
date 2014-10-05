@@ -84,7 +84,7 @@ void Interpreter::resetQuery(){
 	objName = "";
 
 }
-int Interpreter::execFile(string fileName){
+int Interpreter::execFile(string& fileName){
 	//FIXME: not test yet!!!
 	ifstream fp;
     fp.open(fileName,ifstream::in);
@@ -108,7 +108,7 @@ int Interpreter::execFile(string fileName){
 		return SUCCESS;
 	}
 }
-int Interpreter::formatCMD(string cmd){
+int Interpreter::formatCMD(string& cmd){
 	
 	int minpos;
 	int spacepos = cmd.find_first_of(" ");

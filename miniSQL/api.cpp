@@ -12,7 +12,12 @@ API& API::getInstance(){
 FIXME:
 采用  异常  返回执行后的错误结果
 */
-void API::createTable(string tableName){
+int API::createTable(string tableName){
+	try{
+		CataMan::getInstance().createTable(tableName);
+	}catch(int errorCode){
+		return errorCode;
+	}
 }
 void API::createIndex(string indexName){
 }

@@ -156,7 +156,7 @@ int Interpreter::doCreate(){
 	//WARNING: query 需要在format函数之后format
 	if(objType == "table"){
 		try{
-			API::getInstance().createTable(objName);
+			API::getInstance().createTable(objName, query);
 		}catch(int errorCode){
 			return errorCode;
 		}

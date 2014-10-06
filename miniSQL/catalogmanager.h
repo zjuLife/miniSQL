@@ -3,25 +3,26 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-class Table{
+class TableCatalog{
 
 };
-class Key{
+class KeyCatalog{
 
 };
-class Index{
+class IndexCatalog{
 
 };
 class CataMan{
 public:
 	static CataMan& getInstance();
+	void createTableCheck(string& tableName, 
+		vector<Attribute> &attributes);
+	void createTable(string& tableName, 
+		vector<Attribute> &attributes);
 private:
 	CataMan();
 	~CataMan();
-	void createTableCheck(string tableName, 
-		vector<Attribute> attributes);
-	void createTable(string tableName, 
-		vector<Attribute> attributes);
+
 
 };
 #endif

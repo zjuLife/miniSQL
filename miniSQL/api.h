@@ -7,13 +7,13 @@ using namespace std;
 class API{
 public:
 	static API& getInstance();
-	int createTable(string tableName, string attrStr);
-	void createIndex(string indexName);
-	void dropTable(string tableName);
-	void dropIndex(string indexName);
-	void selectFrom(string tableName);
-	void insertInto(string tableName);
-	void deleteWhere(string tableName);
+	int createTable(string& tableName, string& attrStr);
+	void createIndex(string& indexName);
+	void dropTable(string& tableName);
+	void dropIndex(string& indexName);
+	void selectFrom(string& tableName);
+	void insertInto(string& tableName);
+	void deleteWhere(string& tableName);
 private:
 	API();
 	~API();

@@ -10,7 +10,7 @@ class Interpreter{
 public:
 	Interpreter();
 	~Interpreter();
-	int getCmd(string cmd);
+	int getCmd(string& cmd);
 	
 private:
 	string query;		//ÄÚÈİ

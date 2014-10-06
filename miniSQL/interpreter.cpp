@@ -29,7 +29,7 @@ string trim(string input){
 		return input;
 	}
 }
-int Interpreter::getCmd(string origincmd){
+int Interpreter::getCmd(string& origincmd){
 	string cmd = trim(origincmd);
 	if(cmd == "quit"){
 		return QUITMINISQL;

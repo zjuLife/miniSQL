@@ -1,9 +1,9 @@
-#ifndef _API_H_
+ï»¿#ifndef _API_H_
 #define _API_H_
 #include <iostream>
 #include "catalogmanager.h"
 using namespace std;
-//API ×÷Îªµ¥ÀıÄ£Ê½
+//API ä½œä¸ºå•ä¾‹æ¨¡å¼
 class API{
 public:
 	static API& getInstance();

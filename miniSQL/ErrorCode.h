@@ -1,7 +1,7 @@
-#ifndef _ERRORCODE_H_
+ï»¿#ifndef _ERRORCODE_H_
 #define _ERRORCODE_H_
-#define SUCCESS		0x0001		//³É¹¦
-#define EMPTYSTRING 0x0002		//¿ÕÊäÈë
+#define SUCCESS		0x0001		//æˆåŠŸ
+#define EMPTYSTRING 0x0002		//ç©ºè¾“å…¥
 
 //Create
 
@@ -9,16 +9,16 @@
 
 
 
-#define FAIL 		0x1000		//Ê§°Ü
+#define FAIL 		0x1000		//å¤±è´¥
 
 #define DROPTABLERROR 0x2000
 
 #define DROPINDEXERROR 0x2001
-#define SYNTAXERROR 0x7000		//Óï·¨Ê§°Ü
+#define SYNTAXERROR 0x7000		//è¯­æ³•å¤±è´¥
 
-#define FILENOTFOUND	0x8000		//´ò¿ªÎÄ¼şÊ§°Ü
-#define FILEEXE		0x8001		//8001 - FFFE±£Áô
-								//´íÎóÂë&7FFFºó µÃµ½ĞĞºÅ
+#define FILENOTFOUND	0x8000		//æ‰“å¼€æ–‡ä»¶å¤±è´¥
+#define FILEEXE		0x8001		//8001 - FFFEä¿ç•™
+								//é”™è¯¯ç &7FFFå å¾—åˆ°è¡Œå·
 
-#define QUITMINISQL 0xFFFF		//ÍË³ö
+#define QUITMINISQL 0xFFFF		//é€€å‡º
 #endif

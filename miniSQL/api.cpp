@@ -1,16 +1,16 @@
-#include "api.h"
+ï»¿#include "api.h"
 API::API(){
 }
 API::~API(){
 }
 API& API::getInstance(){
-	static API instance;	//¾²Ì¬µ¥Àı
+	static API instance;	//é™æ€å•ä¾‹
 	return instance;
 }
 
 /*
 FIXME:
-²ÉÓÃ  Òì³£  ·µ»ØÖ´ĞĞºóµÄ´íÎó½á¹û
+é‡‡ç”¨  å¼‚å¸¸  è¿”å›æ‰§è¡Œåçš„é”™è¯¯ç»“æœ
 */
 int API::createTable(string& tableName, string& attrStr){
 	//TODO: attrString to attr Vector

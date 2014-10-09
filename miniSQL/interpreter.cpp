@@ -1,4 +1,4 @@
-//·­ÒëÃüÁî  ½âÎöÍê³Éºó  ½»¸øAPI class ´¦Àí
+ï»¿//ç¿»è¯‘å‘½ä»¤  è§£æå®Œæˆå  äº¤ç»™API class å¤„ç†
 #include "interpreter.h"
 #include "ErrorCode.h"
 #include "api.h"
@@ -143,8 +143,8 @@ int Interpreter::formatCMD(string& cmd){
 /******************************************/
 /*
 FIXME:
-Òì³£   »¹ÊÇÓÃ   ·µ»ØÖµ£¿
-¶ş¼¶´«²Î
+å¼‚å¸¸   è¿˜æ˜¯ç”¨   è¿”å›å€¼ï¼Ÿ
+äºŒçº§ä¼ å‚
 */
 
 /*
@@ -153,7 +153,7 @@ FIXME:
 /*****************************************/
 int Interpreter::doCreate(){
 	 //cout<<objType<<endl;
-	//WARNING: query ĞèÒªÔÚformatº¯ÊıÖ®ºóformat
+	//WARNING: query éœ€è¦åœ¨formatå‡½æ•°ä¹‹åformat
 	if(objType == "table"){
 		try{
 			API::getInstance().createTable(objName, query);

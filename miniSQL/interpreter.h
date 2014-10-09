@@ -1,4 +1,4 @@
-#ifndef _INTERPRETER_H_
+ï»¿#ifndef _INTERPRETER_H_
 #define _INTERPRETER_H_
 #include <iostream>
 #include <string>
@@ -13,13 +13,13 @@ public:
 	int getCmd(string& cmd);
 	
 private:
-	string query;		//ÄÚÈİ
+	string query;		//å†…å®¹
 	string opType;
-	string objType;		//±í »¹ÊÇ index
-	string objName;		//tablename »òÕß indexname
+	string objType;		//è¡¨ è¿˜æ˜¯ index
+	string objName;		//tablename æˆ–è€… indexname
 	void resetQuery();
 	int doQuery();
-	int formatCMD(string& cmd);	//µÃµ½¸ñÊ½»¯ºóµÄquery´® ºÍqueryÀàĞÍ
+	int formatCMD(string& cmd);	//å¾—åˆ°æ ¼å¼åŒ–åçš„queryä¸² å’Œqueryç±»å‹
 	int execFile(string& fileName);
 
 	int doCreate();

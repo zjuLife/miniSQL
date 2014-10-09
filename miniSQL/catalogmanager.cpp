@@ -1,4 +1,4 @@
-#include "catalogmanager.h"
+ï»¿#include "catalogmanager.h"
 CataMan& CataMan::getInstance(){
 	static CataMan instance;
 	return instance;
@@ -9,7 +9,7 @@ CataMan::~CataMan(){};
 void CataMan::createTable(string& tableName, vector<Attribute> &attributes){
 
 	TableCatalog tc;
-	// ÉèÖÃºÃÒªĞ´ÈëµÄ table ĞÅÏ¢£¨CATALOG_HAS_PRIMARY_KEY ±êÖ¾ÔÚÉÔºó´´½¨ÊôĞÔÊ±Ìí¼Ó£¬CATALOG_HAS_INDEX ÔÚ´´½¨Ë÷ÒıÊ±Ìí¼Ó£©
+	// è®¾ç½®å¥½è¦å†™å…¥çš„ table ä¿¡æ¯ï¼ˆCATALOG_HAS_PRIMARY_KEY æ ‡å¿—åœ¨ç¨ååˆ›å»ºå±æ€§æ—¶æ·»åŠ ï¼ŒCATALOG_HAS_INDEX åœ¨åˆ›å»ºç´¢å¼•æ—¶æ·»åŠ ï¼‰
 	tc.flag = CATALOG_SPACE_USED;
 	tc.flag &= ~CATALOG_HAS_INDEX;
 	memset(tc.tableName, 0, NAME_LENGTH);
@@ -17,7 +17,7 @@ void CataMan::createTable(string& tableName, vector<Attribute> &attributes){
 	tc.numberOfKeys = attributes.size();
 	tc.primaryKey = 0;
 	tc.indexFlags = 0;
-	// Ğ´Èë tableCatalog
+	// å†™å…¥ tableCatalog
 	short newTableIndex = -1;
 	for (size_t i = 0; i < tableCatalog.size(); i++)
 		if (!(tableCatalog[i].flag & CATALOG_SPACE_USED)) {
@@ -30,11 +30,11 @@ void CataMan::createTable(string& tableName, vector<Attribute> &attributes){
 		newTableIndex = tableCatalog.size() - 1;
 	}
 
-	// keyCatalog ÖĞ²éÕÒÎ´Ê¹ÓÃ¿Õ¼ä£¬»òĞÂ¿ª¿Õ¼ä
+	// keyCatalog ä¸­æŸ¥æ‰¾æœªä½¿ç”¨ç©ºé—´ï¼Œæˆ–æ–°å¼€ç©ºé—´
 	KeyCatalog kc;
 	short currentKeyIndex = -1, previousKeyIndex = 0;
 	for (size_t i = 0; i < attributes.size(); i++) {
-		// ¶Ôµ±Ç°ÊôĞÔ£¬ÉèÖÃºÃÒªĞ´ÈëµÄ key ĞÅÏ¢
+		// å¯¹å½“å‰å±æ€§ï¼Œè®¾ç½®å¥½è¦å†™å…¥çš„ key ä¿¡æ¯
 		kc.flag = CATALOG_SPACE_USED;
 		if (attributes[i].isPrimary()) {
 			kc.flag |= CATALOG_IS_PRIMARY_KEY;
@@ -60,34 +60,34 @@ void CataMan::createTable(string& tableName, vector<Attribute> &attributes){
 			kc.keyType = 2;
 			kc.keyLength = 4;
 			break;
-		default: // Ä¬ÈÏ¿´×÷³¤¶ÈÎª 255 µÄ×Ö·û´®
+		default: // é»˜è®¤çœ‹ä½œé•¿åº¦ä¸º 255 çš„å­—ç¬¦ä¸²
 			kc.keyType = 1;
 			kc.keyLength = 255;
 			break;
 		}
 		kc.nextKey = -1;
-		// Ğ´Èë keyCatalog
+		// å†™å…¥ keyCatalog
 		currentKeyIndex++;
 		while (currentKeyIndex < (int)keyCatalog.size()
 				&& (keyCatalog[currentKeyIndex].flag & CATALOG_SPACE_USED))
 			currentKeyIndex++;
 		if (currentKeyIndex >= (int)keyCatalog.size())
-			// ĞÂ¿ª¿Õ¼ä
+			// æ–°å¼€ç©ºé—´
 			keyCatalog.push_back(kc);
 		else
-			// Õ¼ÓÃµ±Ç°Î´Ê¹ÓÃ¿Õ¼ä
+			// å ç”¨å½“å‰æœªä½¿ç”¨ç©ºé—´
 			keyCatalog[currentKeyIndex] = kc;
 
 		if (i == 0)
-			// Èç¹ûµ±Ç°ÊÇµÚÒ»ÌõÊôĞÔ£¬ĞŞ¸Ä tableCatalog µÄ firstKey
+			// å¦‚æœå½“å‰æ˜¯ç¬¬ä¸€æ¡å±æ€§ï¼Œä¿®æ”¹ tableCatalog çš„ firstKey
 			tableCatalog[newTableIndex].firstKey = currentKeyIndex;
 		else
-			// ·ñÔòĞŞ¸Ä´Ë±íÉÏÒ»ÌõÊôĞÔµÄ nextKey£¨¼´µ±Ç°²»ÊÇµÚÒ»ÌõÊôĞÔ£©
+			// å¦åˆ™ä¿®æ”¹æ­¤è¡¨ä¸Šä¸€æ¡å±æ€§çš„ nextKeyï¼ˆå³å½“å‰ä¸æ˜¯ç¬¬ä¸€æ¡å±æ€§ï¼‰
 			keyCatalog[previousKeyIndex].nextKey = currentKeyIndex;
 
 		previousKeyIndex = currentKeyIndex;
 
-		// Èç¹ûµ±Ç°ÊôĞÔÊÇÖ÷¼ü£¬ĞŞ¸Ä tableCatalog µÄ±êÖ¾ºÍ primaryKey
+		// å¦‚æœå½“å‰å±æ€§æ˜¯ä¸»é”®ï¼Œä¿®æ”¹ tableCatalog çš„æ ‡å¿—å’Œ primaryKey
 		if (kc.flag & CATALOG_IS_PRIMARY_KEY) {
 			tableCatalog[newTableIndex].flag |= CATALOG_HAS_PRIMARY_KEY;
 			tableCatalog[newTableIndex].primaryKey = i;

@@ -1,4 +1,4 @@
-#ifndef _CATALOGMANAGER_H_
+﻿#ifndef _CATALOGMANAGER_H_
 #define _CATALOGMANAGER_H_
 #include <iostream>
 #include <vector>

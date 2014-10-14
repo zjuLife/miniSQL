@@ -2,6 +2,7 @@
 #include <iostream>
 #include "interpreter.h"
 #include "ErrorCode.h"
+#include "catalogmanager.h"
 using namespace std;
 void initialScreen(){
 	cout<<"== Welcome into miniSQL =="<<endl;
@@ -16,9 +17,12 @@ void showError(int& errorCode){
 	}
 }
 int main(void){
-
+	try{ //初始化 catalogManager
+		CataMan::getInstance().initManager();
+	}catch(int errorCode){
+		showError(errorCode);
+	}
 	initialScreen();
-
 	char cmdBuffer[1000];
 	int cmdErrorCode = SUCCESS;
 	

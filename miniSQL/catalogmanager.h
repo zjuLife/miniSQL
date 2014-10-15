@@ -32,7 +32,7 @@ class IndexCatalog {
 class CataMan{
 public:
 	static CataMan& getInstance();
-	void createTableCheck(string& tableName, 
+	void tableExistCheck(string& tableName, 
 		vector<Attribute> &attributes);
 	void createTable(string& tableName, 
 		vector<Attribute> &attributes);

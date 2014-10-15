@@ -17,11 +17,6 @@ void showError(int& errorCode){
 	}
 }
 int main(void){
-	try{ //初始化 catalogManager
-		CataMan::getInstance().initManager();
-	}catch(int errorCode){
-		showError(errorCode);
-	}
 	initialScreen();
 	char cmdBuffer[1000];
 	int cmdErrorCode = SUCCESS;
@@ -36,7 +31,7 @@ int main(void){
 			cout<<endl;
 			break;
 		}
-		gets_s(cmdBuffer);
+		gets(cmdBuffer);
 		string cmdLine(cmdBuffer);
 		cmdErrorCode = interpreter.getCmd(cmdLine);
 		showError(cmdErrorCode);

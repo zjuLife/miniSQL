@@ -22,12 +22,13 @@ void CataMan::saveManager() throw(int){
 }
 /********************加载***********************/
 void CataMan::loadTableCatalog() throw(int){
-	ifstream fin("catalog\\tablecata.dat", ios::binary | ios:ate);
+	
+	ifstream fin("catalog\\tablecata.dat", ios::binary | ios::ate);
 	long size = (long) fin.tellg();
 	long num = size / (3 + NAME_LENGTH + sizeof(long) + 2 * sizeof(short));
 	fin.seekg(0, ios::beg);
 	TableCatalog tc;
-	for(size_t i=0;i<num;i++){
+	for(int i=0;i<num;i++){
 		fin.read(&tc.flag, 1);
 		fin.read(tc.tableName, NAME_LENGTH);
 		fin.read(&tc.numberOfKeys, 1);
@@ -94,7 +95,7 @@ tableCatalog file 格式
 		firstKey 第一个键信息
 		firstIndex 第一个index信息
 		**/
-		fout.write(&tableCatalog.flag, 1);
+		fout.write(&tableCatalog[i].flag, 1);
 		fout.write(tableCatalog[i].tableName, NAME_LENGTH);
 		fout.write(&tableCatalog[i].numberOfKeys, 1);
 		fout.write(&tableCatalog[i].primaryKey, 1);
@@ -102,6 +103,7 @@ tableCatalog file 格式
 		fout.write((char *) &tableCatalog[i].firstKey, sizeof(short));
 		fout.write((char *) &tableCatalog[i].firstIndex, sizeof(short));
 	}
+	fout.close();
 }
 
 void CataMan::saveKeyCatalog() throw(int) {
@@ -148,79 +150,98 @@ indexCatalog file 格式
 }
 
 /**********create table**************/
-void CataMan::tableExistCheck(const string &tableName, const vector<Attribute> &attributes){
+bool CataMan::tableExistCheck(string &tableName, vector<Attribute> &attributes){
 	for(size_t i = 0;i<tableCatalog.size();i++){
-		if((tableCatalog[i].flag & CATALOG_SAPCE_USED)&&
+		if((tableCatalog[i].flag & CATALOG_SPACE_USED)&&
 			!strcmp(tableCatalog[i].tableName, tableName.c_str())){
 			/* 如果标记位置1 且名字相同 */
-			throw TABLE_EXIST;
-			break;
+			return true;
 		}	
 	}
+	return false;
 }
-void CataMan::createTable(const string &tableName, const vector<Attribute> &attributes){
+void CataMan::createTable(string &tableName, vector<Attribute> &attributes){
 	tableExistCheck(tableName, attributes);
 	TableCatalog tc;
-	/**	tc TableCatalog中的信息设置好
-	tc.falg = 
-	memset(tc.tableName, 0, NAME_LEGNTH);
-	strcpy(tc.tableName, table.c_str());
-	tc.numberOfKeys = ;
-	tc.primaryKey = ;
-	tc.indexFlags = 
-	**/
+	/**	tc TableCatalog中的信息设置好 **/
+	tc.flag = CATALOG_SPACE_USED;
+	tc.flag &= ~CATALOG_HAS_INDEX;
+	memset(tc.tableName, 0, NAME_LENGTH);
+	strcpy(tc.tableName, tableName.c_str());
+	tc.numberOfKeys = attributes.size();
+	tc.primaryKey = 32;		//WARNING: 初始化为32 表示没有主键！！
+	tc.indexFlags = 0;
+	
 	//写入tableCatalogManager
 	short newTableIndex = -1;
 	for(size_t i=0;i<tableCatalog.size();i++){
 		/* 中途插入空挡 */
-		if(!(tableCatalog.flag & CATALOG_SAPCE_USED)){
+		if(!(tableCatalog[i].flag & CATALOG_SPACE_USED)){
 			newTableIndex = i;
 			tableCatalog[i] = tc;
 			break;
 		}
 	}
-	if(newTableIndex == -1){}
+	if(newTableIndex == -1){
 		/* 添加到最后 */
 		tableCatalog.push_back(tc);
 		newTableIndex = tableCatalog.size() - 1;
 	}
+
 	KeyCatalog kc;
-	short currentKeyIndex = 0;
+	short currentKeyIndex = -1;
 	short previousKeyIndex = 0;
 	//存key
-	for( size_t i=0;i<attributes.size();i++){
-		/* 设置keycatalogman 的信息
-		kc.flag = CATALOG_SAPCE_USED;
+	for(size_t i=0;i<attributes.size();i++){
+		/* 设置keycatalogman 的信息 */
+		kc.flag = CATALOG_SPACE_USED;
 		if(attributes[i].isPrimary()){
-			//TODO:
+			kc.flag |= CATALOG_IS_PRIMARY_KEY;
+			kc.flag |= CATALOG_IS_UNIQUE;
+			kc.flag |= CATALOG_IS_NOT_NULL;
 		}
 		if(attributes[i].isUnique()){
-			//TODO:
+			kc.flag |= CATALOG_IS_UNIQUE;
 		}
 		if(attributes[i].isNotNull()){
-
+			kc.flag |= CATALOG_IS_NOT_NULL;
 		}
-		//memset
-		//strcpy()
+		memset(kc.keyName, 0, NAME_LENGTH);
+		//what??????_------------____????*/
+		strcpy(kc.keyName, attributes[i].m_name.c_str());
 		switch(attributes[i].m_type){
 		case INT: //类型判断
-		kc.keyType = ;
-		kc.keyLength = ;
-		break;
-		//TODO: char float default....
+			kc.keyType = INT_TYPE;	//0
+			kc.keyLength = INT_LENGTH; //4
+			break;
+		case CHAR:
+			kc.keyType = CHAR_TYPE; //1
+			//waht??
+			kc.keyLength = attributes[i].m_length;
+			break;
+		case FLOAT:
+			kc.keyType = FLOAT_TYPE; //2
+			kc.keyLength = FLOAT_LENGTH;	//4
+			break;
+		default:
+			kc.keyType = CHAR_TYPE;	//regard as char
+			kc.keyLength = 255;		//max length
+			break;
 		}
 		kc.nextKey = -1;
-		*/
+		currentKeyIndex++;
 		//写入KeyCatalog的内存中
 		while(currentKeyIndex < (int)keyCatalog.size() &&
-			(keyCatalog[currentKeyIndex].flag & CATALOG_SAPCE_USED)){
+			(keyCatalog[currentKeyIndex].flag & CATALOG_SPACE_USED)){
 			currentKeyIndex++;
 		}
+		//找到没有使用的那个
 		if(currentKeyIndex >= (int)keyCatalog.size())
+			//队列尾
 			keyCatalog.push_back(kc);
-		else
+		else	//否则插入空位置
 			keyCatalog[currentKeyIndex] = kc;
-		if(i == 0){
+		if(i == 0){	//第一条属性
 			tableCatalog[newTableIndex].firstKey = currentKeyIndex;
 		}
 		else{
@@ -228,7 +249,8 @@ void CataMan::createTable(const string &tableName, const vector<Attribute> &attr
 		}
 		previousKeyIndex = currentKeyIndex;
 		if(kc.flag & CATALOG_IS_PRIMARY_KEY){
-			//TODO:
+			tableCatalog[newTableIndex].flag |= CATALOG_HAS_PRIMARY_KEY;
+			tableCatalog[newTableIndex].primaryKey = i;
 		}
 	}
 }

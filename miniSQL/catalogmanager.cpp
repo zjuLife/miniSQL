@@ -150,18 +150,20 @@ indexCatalog file 格式
 }
 
 /**********create table**************/
-bool CataMan::tableExistCheck(string &tableName, vector<Attribute> &attributes){
+int CataMan::tableExistCheck(string &tableName){
 	for(size_t i = 0;i<tableCatalog.size();i++){
 		if((tableCatalog[i].flag & CATALOG_SPACE_USED)&&
 			!strcmp(tableCatalog[i].tableName, tableName.c_str())){
 			/* 如果标记位置1 且名字相同 */
-			return true;
+			return i;
 		}	
 	}
-	return false;
+	return -1;
 }
 void CataMan::createTable(string &tableName, vector<Attribute> &attributes){
-	tableExistCheck(tableName, attributes);
+	if(tableExistCheck(tableName) == -1){
+		throw TABLE_EXIST;
+	}
 	TableCatalog tc;
 	/**	tc TableCatalog中的信息设置好 **/
 	tc.flag = CATALOG_SPACE_USED;
@@ -253,4 +255,195 @@ void CataMan::createTable(string &tableName, vector<Attribute> &attributes){
 			tableCatalog[newTableIndex].primaryKey = i;
 		}
 	}
+}
+
+void CataMan::dropTable(string &tableName, vector<Attribute> &attributes){
+	if(tableExistCheck(tableName)!=-1){
+		throw TABLE_NOT_EXIST;
+	}
+	short firstKeyIndex = 0;
+	short firstIndexIndex = 0;
+	bool hasIndex = false;
+	for(size_t i=0;i<tableCatalog.size();i++){
+		if((tableCatalog[i].flag & CATALOG_SPACE_USED) &&
+			!strcmp(tableCatalog[i].tableName, tableName.c_str())){
+			firstKeyIndex = tableCatalog[i].firstKey;
+			if(tableCatalog[i].flag & CATALOG_HAS_INDEX){
+				hasIndex = true;
+				firstIndexIndex = tableCatalog[i].firstIndex;
+			}
+			//	在之间就修改flag标记
+			tableCatalog[i].flag &= ~CATALOG_SPACE_USED;
+			//在最后就pop出去
+			if(i == tableCatalog.size()-1)
+				tableCatalog.popback();
+		}
+		//删除keycatalog
+		short currentKeyIndex = firstKeyIndex;
+		while(currentKeyIndex !=-1){
+			keyCatalog[currentKeyIndex].flag & ~CATALOG_SPACE_USED;
+			currentKeyIndex = keyCatalog[currentKeyIndex].nextKey;
+		}
+		//删除indexCatalog
+		if(hasIndex){
+			short currentIndexIndex = firstIndexIndex;
+			while(currentIndexIndex != -1){
+				//WARNING: index的没有pop结尾的元素？？ 
+				indexCatalog[currentIndexIndex].flag &= ~CATALOG_SPACE_USED;
+				currentIndexIndex = indexCatalog[currentIndexIndex].nextIndex;
+			}
+		}
+	}
+}
+int CataMan::createIndexCheck(string &indexName, string &tableName
+	string &keyName){
+	short firstKeyIndex = 0;
+	short firstIndexIndex = 0;
+	unsigned long indexFlags = 0;
+
+	bool hasIndex = false; 
+	int i = tableExistCheck(tableName);
+	if(i == -1){
+		throw TABLE_NOT_EXIST;
+	}
+	else{
+		/* 获得表索引和 key 和key索引的位置*/
+		indexFlags = tableCatalog[i].indexFlag;
+		firstKey = tableCatalog.firstKey;
+		if(tableCatalog[i].flag & CATALOG_HAS_INDEX){
+			hasIndex = true;
+			firstIndexIndex = tableCatalog[i].firstIndex;
+		}
+	}
+	//检查属性是否存在，且为UNIQUE
+	bool found = false; 
+	short currentKeyIndex = firstKeyIndex;	//第一个key的索引
+	short keNumber = -1;					//第几个Key
+	while(currentKeyIndex != -1 && !found){
+		keyNumber++;
+		if(!strcmp(keyCatalog[currentKeyIndex].keyName, keyName.c_str())){
+			found = true;
+			//FIXME: 我也不知道我在写什么。。。
+			if((keyCatalog[currentKeyIndex].flag & CATALOG_IS_UNIQUE)){
+				throw KEY_NOT_UNIQUE;
+			}
+			break;
+		}
+		currentKeyIndex = keyCatalog[currentKeyIndex].nextKey;
+	}
+	if(!found)
+		throw KEY_NOT_EXIST;
+	if((indexFlags >> keyNumber) & 1)
+		throw INDEX_EXIST;
+	for(size_t i=0;i<indexCatalog.size();i++){
+		if((indexCatalog[i].flag & CATALOG_SPACE_USED)&&
+			!strcmp(indexCatalog[i].indexName, indexName.c_str()))
+			throw INDEX_NAME_CONFLICT;
+	}
+	return i;
+}
+void CataMan::createIndex(string &indexName, string &tableName, string &keyName){
+	int i = createIndexCheck();
+	short tableIndex = 0;
+	short firstKeyIndex = 0;
+	short firstIndexIndex = 0;
+	firstKeyIndex = tableCatalog[i].firstKey;
+	firstIndexIndex = tableCatalog[i].firstIndex;
+	short currentKeyIndex = firstKeyIndex;
+	short keyName = -1;
+	//在keycatalog中找到属性获取属性号  标记为is_index
+	while(currentKeyIndex != -1){
+		keyNumber++;
+		if(!strcmp(keyCatalog[currentKeyIndex].keyName, keyName.c_str())){
+			keyCatalog[currentKeyIndex].flag |= CATALOG_IS_INDEX;
+			break;
+		}
+		currentKeyIndex = keyCatalog[currentKeyIndex].nextKey;
+	}
+	tableCatalog[tableIndex].indexFlags |= 1<<keyNumber;
+	IndexCatalog ic;
+	ic.flag = CATALOG_SPACE_USED;
+	memset(ic.indexName, 0, NAME_LENGTH);
+	strcpy(ic.indexName, indexName.c_str());
+	ic.onTable = tableIndex;
+	ic.key = keyNumber;
+	ic.nextIndex = -1;
+	int newIndexIndex = -1;
+	for(size_t i=0;i<indexCatalog.size();i++){
+		if(!(indexCatalog[i].flag & CATALOG_SPACE_USED)){
+			newIndexIndex = i;
+			indexCatalog[i] = ic;
+			break;
+		}
+	}
+	if(newIndexIndex == -1 ){
+		indexCatalog.push_back(ic);
+		newIndexIndex = indexCatalog.size() - 1;
+	}
+	if(!(tableCatalog[tableIndex].flag & CATALOG_HAS_INDEX)){
+		tableCatalog[tableIndex].flag |= CATALOG_HAS_INDEX;
+		tableCatalog[tableIndex].firstIndex = newIndexIndex;
+	}
+	else{
+		int currentIndexIndex = firstIndexIndex;
+		while(indexCatalog[currentIndexIndex].nextIndex != -1){
+			currentIndexIndex = indexCatalog[currentIndexIndex].nextIndex;
+		}
+		indexCatalog[currentIndexIndex].nextIndex = newIndexIndex;
+	}
+}
+int CataMan::indexExistCheck(string &indexName){
+	bool found = false;
+	for(size_t i=0;i<indexCatalog.size();i++){
+		if((indexCatalog[i].flag & CATALOG_SPACE_USED) &&
+			!strcmp(indexCatalog[i].indexName, indexName.c_str())){
+			found = true;
+			return i;
+		}
+	}
+	if(!found)
+		return -1;
+}
+void CataMan::dropIndex(string &indexName){
+	//i 表示index的位置 -1表示没找到
+	int i = indexExistCheck();
+	if(i==-1){
+		throw INDEX_NOT_EXIST;
+	}
+	else{
+		short tableIndex = 0;
+		short keyNumber = 0;
+		short nextIndexIndex = 0;
+		tableIndex = indexCatalog[i].onTable;
+		keyNumber = indexCatalog[i].key;
+		nextIndexIndex = indexCatalog[i].nextIndex;
+		indexCatalog[i].flag &= ~CATALOG_SPACE_USED;
+		
+		short firstKeyIndex = tableCatalog[tableIndex].firstKey;
+		short currentKeyIndex = firstKeyIndex;
+		short currentKeyNumber =  -1;
+
+		while(currentKeyIndex != -1){
+			currentKeyNumber++;
+			if(currentKeyNumber == keyNumber){
+				keyCatalog[currentKeyIndex].flag &= ~CATALOG_IS_INDEX;
+				break;
+			}
+			currentKeyIndex = keyCatalog[currentKeyIndex].nextKey;
+		}
+		if(tableCatalog[tableIndex].firstIndex != indexIndex){
+			int currentIndexIndex = tableCatalog[tableIndex].firstIndex;
+			while(indexCatalog[currentIndexIndex].nextIndex!=indexIndex){
+				currentIndexIndex = indexCatalog[currentIndexIndex].nextIndex;
+			}
+			indexCatalog[currentIndexIndex].nextIndex = nextIndexIndex;
+		}
+		else
+			tableCatalog[tableIndex]. = nextIndexIndex;
+		tableCatalog[tableIndex].indexFlags &= ~(unsigned long)(1<<keyNumber);
+		if(tableCatalog[tableIndex].firstIndex == -1){
+			tableCatalog[tableIndex].flag &= ~CATALOG_HAS_INDEX;
+		}
+	}
+
 }

@@ -37,10 +37,11 @@
 
 	
 //Create table 0x1xxx
-#define TABLE_EXIST 0x1001		
-//Drop table 0x2xxx
-#define DROPTABLERROR 0x2000
+#define TABLE_EXIST 0x1001
 
+//Drop table 0x2xxx
+//#define DROPTABLERROR 0x2000
+#define TABLE_NOT_EXIST 0x2001
 
 
 //Create index 0x2xxx

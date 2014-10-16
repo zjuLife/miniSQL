@@ -20,6 +20,7 @@ int API::createTable(string& tableName, string& attrStr){
 	}catch(int errorCode){
 		return errorCode;
 	}
+	return SUCCESS;
 }
 void API::createIndex(string& indexName){
 }

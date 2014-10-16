@@ -276,7 +276,7 @@ void CataMan::dropTable(string &tableName, vector<Attribute> &attributes){
 			tableCatalog[i].flag &= ~CATALOG_SPACE_USED;
 			//在最后就pop出去
 			if(i == tableCatalog.size()-1)
-				tableCatalog.popback();
+				tableCatalog.pop_back();
 		}
 		//删除keycatalog
 		short currentKeyIndex = firstKeyIndex;
@@ -295,7 +295,7 @@ void CataMan::dropTable(string &tableName, vector<Attribute> &attributes){
 		}
 	}
 }
-int CataMan::createIndexCheck(string &indexName, string &tableName
+int CataMan::createIndexCheck(string &indexName, string &tableName, 
 	string &keyName){
 	short firstKeyIndex = 0;
 	short firstIndexIndex = 0;
@@ -308,8 +308,8 @@ int CataMan::createIndexCheck(string &indexName, string &tableName
 	}
 	else{
 		/* 获得表索引和 key 和key索引的位置*/
-		indexFlags = tableCatalog[i].indexFlag;
-		firstKey = tableCatalog.firstKey;
+		indexFlags = tableCatalog[i].indexFlags;
+		firstKeyIndex = tableCatalog[i].firstKey;
 		if(tableCatalog[i].flag & CATALOG_HAS_INDEX){
 			hasIndex = true;
 			firstIndexIndex = tableCatalog[i].firstIndex;
@@ -318,7 +318,7 @@ int CataMan::createIndexCheck(string &indexName, string &tableName
 	//检查属性是否存在，且为UNIQUE
 	bool found = false; 
 	short currentKeyIndex = firstKeyIndex;	//第一个key的索引
-	short keNumber = -1;					//第几个Key
+	short keyNumber = -1;					//第几个Key
 	while(currentKeyIndex != -1 && !found){
 		keyNumber++;
 		if(!strcmp(keyCatalog[currentKeyIndex].keyName, keyName.c_str())){
@@ -334,7 +334,7 @@ int CataMan::createIndexCheck(string &indexName, string &tableName
 	if(!found)
 		throw KEY_NOT_EXIST;
 	if((indexFlags >> keyNumber) & 1)
-		throw INDEX_EXIST;
+		throw INDEX_EXIST_ON_KEY;
 	for(size_t i=0;i<indexCatalog.size();i++){
 		if((indexCatalog[i].flag & CATALOG_SPACE_USED)&&
 			!strcmp(indexCatalog[i].indexName, indexName.c_str()))
@@ -343,14 +343,14 @@ int CataMan::createIndexCheck(string &indexName, string &tableName
 	return i;
 }
 void CataMan::createIndex(string &indexName, string &tableName, string &keyName){
-	int i = createIndexCheck();
+	int i = createIndexCheck(indexName, tableName, keyName);
 	short tableIndex = 0;
 	short firstKeyIndex = 0;
 	short firstIndexIndex = 0;
 	firstKeyIndex = tableCatalog[i].firstKey;
 	firstIndexIndex = tableCatalog[i].firstIndex;
 	short currentKeyIndex = firstKeyIndex;
-	short keyName = -1;
+	short keyNumber = -1;
 	//在keycatalog中找到属性获取属性号  标记为is_index
 	while(currentKeyIndex != -1){
 		keyNumber++;
@@ -401,12 +401,11 @@ int CataMan::indexExistCheck(string &indexName){
 			return i;
 		}
 	}
-	if(!found)
-		return -1;
+	return -1;
 }
 void CataMan::dropIndex(string &indexName){
 	//i 表示index的位置 -1表示没找到
-	int i = indexExistCheck();
+	int i = indexExistCheck(indexName);
 	if(i==-1){
 		throw INDEX_NOT_EXIST;
 	}
@@ -431,15 +430,15 @@ void CataMan::dropIndex(string &indexName){
 			}
 			currentKeyIndex = keyCatalog[currentKeyIndex].nextKey;
 		}
-		if(tableCatalog[tableIndex].firstIndex != indexIndex){
+		if(tableCatalog[tableIndex].firstIndex != i){
 			int currentIndexIndex = tableCatalog[tableIndex].firstIndex;
-			while(indexCatalog[currentIndexIndex].nextIndex!=indexIndex){
+			while(indexCatalog[currentIndexIndex].nextIndex!=i){
 				currentIndexIndex = indexCatalog[currentIndexIndex].nextIndex;
 			}
 			indexCatalog[currentIndexIndex].nextIndex = nextIndexIndex;
 		}
 		else
-			tableCatalog[tableIndex]. = nextIndexIndex;
+			tableCatalog[tableIndex].firstIndex = nextIndexIndex;
 		tableCatalog[tableIndex].indexFlags &= ~(unsigned long)(1<<keyNumber);
 		if(tableCatalog[tableIndex].firstIndex == -1){
 			tableCatalog[tableIndex].flag &= ~CATALOG_HAS_INDEX;

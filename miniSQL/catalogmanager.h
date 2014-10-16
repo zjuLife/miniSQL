@@ -42,10 +42,16 @@ class CataMan{
 public:
 	static CataMan& getInstance();
 	
-	void createTable(string& tableName, 
-		vector<Attribute> &attributes);
+	void createTable(string &tabLeName, vector<Attribute> &attributes);
+	void dropTable(string &tableName, vector<Attribute> &attributes);
 	
-	
+	void createIndex(string &indexName, string &tableName, string &keyName);
+	void  dropIndex(string &indexName);
+
+	void selectCheck();
+	void insertCheck();
+	void deleteCheck();
+
 
 private:
 	CataMan() throw(int);
@@ -67,7 +73,11 @@ private:
 	void saveKeyCatalog() throw(int);
 	void saveIndexCatalog() throw(int);
 
-	bool tableExistCheck(string& tableName, 
-		vector<Attribute> &attributes);
+	int tableExistCheck(string& tableName);
+	int createIndexCheck(string &indexName, string &tableName, string &keyName);
+	int indexExistCheck(string &indexName);
+	
+
+
 };
 #endif

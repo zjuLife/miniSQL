@@ -44,12 +44,18 @@
 #define TABLE_NOT_EXIST 0x2001
 
 
-//Create index 0x2xxx
+//Create index 0x3xxx
+#define KEY_NOT_UNIQUE 0x3001
+#define KEY_NOT_EXIST 0x3002
+#define INDEX_EXIST_ON_KEY 0x3003
+#define INDEX_NAME_CONFLICT 0x3004
+
+//Drop index 0x4xxx
+#define INDEX_NOT_EXIST 0x4001
 
 
 
-//Drop index 0x3xxx
-#define DROPINDEXERROR 0x2001
+
 #define SYNTAXERROR 0x7000		//语法失败
 
 #define FILENOTFOUND	0x8000		//打开文件失败
